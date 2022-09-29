@@ -8,8 +8,8 @@ class RelationConfiguration : IEntityTypeConfiguration<Relation>
     public void Configure(EntityTypeBuilder<Relation> builder)
     {
         builder.HasKey(rel => new { rel.PersonId, rel.ContactId });
-        builder.HasOne(x => x.Person).WithMany().HasForeignKey(rel => rel.PersonId);
-        builder.HasOne(x => x.Contact).WithMany().HasForeignKey(rel => rel.ContactId);
+        builder.HasOne(x => x.Person).WithMany(x => x.Relations).HasForeignKey(rel => rel.PersonId);
+        builder.HasOne(x => x.Contact).WithMany(x => x.Relations).HasForeignKey(rel => rel.ContactId);
     }
 }
 
