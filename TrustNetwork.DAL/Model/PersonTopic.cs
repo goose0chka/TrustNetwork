@@ -8,8 +8,8 @@ namespace TrustNetwork.DAL.Model;
 
 public class PersonTopic
 {
-    public int PersonId { get; set; }
+    public string PersonId { get; set; } = string.Empty;
     public Person Person { get; set; } = null!;
     public int TopicId { get; set; }
-    public Topic Topic { get; set; } = null;
+    public Topic Topic { get; set; } = null!;
 }
