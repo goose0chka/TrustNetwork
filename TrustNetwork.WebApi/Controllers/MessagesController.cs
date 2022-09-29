@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TrustNetwork.BL.DTO;
+
 namespace TrustNetwork.WebApi.Controllers;
 
 [Route("api/[controller]")]
@@ -6,7 +8,7 @@ namespace TrustNetwork.WebApi.Controllers;
 public class MessagesController : ControllerBase
 {
     [HttpPost]
-    public Task<IActionResult> SendMessage()
+    public Task<IActionResult> SendMessage(MessageDto message)
     {
         throw new NotImplementedException();
     }

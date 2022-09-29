@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TrustNetwork.BL\TrustNetwork.BL.csproj" />
     <ProjectReference Include="..\TrustNetwork.DAL\TrustNetwork.DAL.csproj" />
   </ItemGroup>
 
