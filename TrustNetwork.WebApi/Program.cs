@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using TrustNetwork.BL.Services;
 using TrustNetwork.DAL;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,8 @@ builder.Services.AddDbContext<DataContext>(
     contextOpt => contextOpt.UseNpgsql(builder.Configuration["ConnectionStrings:TrustNetworkDb"],
     npgsqlOpt => npgsqlOpt.MigrationsAssembly(typeof(DataContext).Assembly.FullName))
     );
+
+builder.Services.AddScoped<PersonService>();
 
 builder.Services.AddRouting(opt => opt.LowercaseUrls = true);
 

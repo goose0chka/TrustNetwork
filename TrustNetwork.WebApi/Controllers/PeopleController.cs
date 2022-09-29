@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TrustNetwork.BL.DTO;
+using TrustNetwork.BL.Services;
 
 namespace TrustNetwork.WebApi.Controllers;
 
@@ -7,14 +8,24 @@ namespace TrustNetwork.WebApi.Controllers;
 [ApiController]
 public class PeopleController : ControllerBase
 {
-    [HttpPost]
-    public Task<IActionResult> AddPerson(PersonDto person)
+    private readonly PersonService _service;
+
+    public PeopleController(PersonService service)
     {
-        throw new NotImplementedException();
+        _service = service;
+    }
+
+    [HttpPost]
+    [ProducesResponseType(201)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> AddPerson(PersonDto person)
+    {
+        await _service.AddPerson(person);
+        return Created(string.Empty, null);
     }
 
     [HttpPost("{id}/trust_connections")]
-    public Task<IActionResult> SetRelation(IDictionary<string, int> levels)
+    public Task<IActionResult> SetRelation(string id, IDictionary<string, int> levels)
     {
         throw new NotImplementedException();
     }
