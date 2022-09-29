@@ -12,6 +12,8 @@ builder.Services.AddDbContext<DataContext>(
     npgsqlOpt => npgsqlOpt.MigrationsAssembly(typeof(DataContext).Assembly.FullName))
     );
 
+builder.Services.AddRouting(opt => opt.LowercaseUrls = true);
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
