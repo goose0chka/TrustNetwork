@@ -14,5 +14,7 @@ namespace TrustNetwork.DAL
 
         public DbSet<Person> Persons { get; set; } = null!;
         public DbSet<Relation> Relations { get; set; } = null!;
+        public DbSet<Topic> Topics { get; set; }
+        public DbSet<PersonTopic> PersonTopics { get; set; }
     }
 }
