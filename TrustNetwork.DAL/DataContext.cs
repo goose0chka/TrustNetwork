@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TrustNetwork.DAL.Configuration;
 using TrustNetwork.DAL.Model;
 
 namespace TrustNetwork.DAL
@@ -7,6 +8,9 @@ namespace TrustNetwork.DAL
     {
         public DataContext(DbContextOptions<DataContext> options) 
             : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder) 
+            => modelBuilder.ApplyConfigurationsFromAssembly(typeof(PersonConfiguration).Assembly);
 
         public DbSet<Person> Persons { get; set; } = null!;
         public DbSet<Relation> Relations { get; set; } = null!;
