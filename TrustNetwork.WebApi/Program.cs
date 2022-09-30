@@ -15,6 +15,7 @@ builder.Services.AddDbContext<DataContext>(
     );
 
 builder.Services.AddScoped<PersonService>();
+builder.Services.AddScoped<MessagingService>();
 
 builder.Services.AddRouting(opt => opt.LowercaseUrls = true);
 

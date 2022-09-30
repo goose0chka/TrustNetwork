@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TrustNetwork.BL.DTO;
+using TrustNetwork.BL.Services;
 
 namespace TrustNetwork.WebApi.Controllers;
 
@@ -7,9 +8,19 @@ namespace TrustNetwork.WebApi.Controllers;
 [ApiController]
 public class MessagesController : ControllerBase
 {
-    [HttpPost]
-    public Task<IActionResult> SendMessage(MessageDto message)
+    private readonly MessagingService _service;
+
+    public MessagesController(MessagingService service)
     {
-        throw new NotImplementedException();
+        _service = service;
+    }
+
+    [HttpPost]
+    [ProducesResponseType(201)]
+    [ProducesResponseType(400)]
+    public async Task<IActionResult> SendMessage(MessageDto message)
+    {
+        var res = await _service.SendMessage(message);
+        return Created(string.Empty, res);
     }
 }
