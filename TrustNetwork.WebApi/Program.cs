@@ -19,6 +19,13 @@ builder.Services.AddRouting(opt => opt.LowercaseUrls = true);
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+using (var db = scope.ServiceProvider.GetRequiredService<DataContext>())
+{
+    if (db.Database.GetPendingMigrations().Any())
+        db.Database.Migrate();
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
