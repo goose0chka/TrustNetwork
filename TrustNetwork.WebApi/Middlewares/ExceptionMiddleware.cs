@@ -18,30 +18,35 @@ namespace TrustNetwork.WebApi.Middlewares
             catch (Exception ex)
             {
                 var handler = GetHandler(ex);
+                if (handler is null) throw;
                 handler(context);
             }
         }
 
-        private static Action<HttpContext> GetHandler(Exception ex)
+        private static Action<HttpContext>? GetHandler(Exception ex)
         {
             var errBody = JsonSerializer.Serialize(new { error = ex.Message });
-            return ex switch
+            Action<HttpContext>? res = null;
+            switch (ex)
             {
-                BadRequestException => async (HttpContext context) =>
-                {
-                    context.Response.StatusCode = 400;
-                    context.Response.ContentType = "application/json";
-                    await context.Response.WriteAsync(errBody);
-                },
-                NotFoundException => async (HttpContext context) =>
-                {
-                    context.Response.StatusCode = 404;
-                    context.Response.ContentType = "application/json";
-                    await context.Response.WriteAsync(errBody);
-                }
-                ,
-                _ => async (HttpContext context) => { await context.Response.WriteAsync("Unexpected error occured"); }
+                case BadRequestException:
+                    res = async (HttpContext context) =>
+                    {
+                        context.Response.StatusCode = 400;
+                        context.Response.ContentType = "application/json";
+                        await context.Response.WriteAsync(errBody);
+                    };
+                    break;
+                case NotFoundException:
+                    res = async (HttpContext context) =>
+                    {
+                        context.Response.StatusCode = 404;
+                        context.Response.ContentType = "application/json";
+                        await context.Response.WriteAsync(errBody);
+                    };
+                    break;
             };
+            return res;
         }
     }
 }
