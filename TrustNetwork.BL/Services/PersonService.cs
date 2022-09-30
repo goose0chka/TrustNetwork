@@ -15,7 +15,7 @@ public class PersonService
         _context = context;
     }
 
-    public async Task AddPerson(PersonDto dto)
+    public async Task<PersonDto> AddPerson(PersonDto dto)
     {
         if (_context.Persons.Any(x => string.Equals(x.Id, dto.Id)))
             throw new BadRequestException("Person with given id already exists");
@@ -46,6 +46,12 @@ public class PersonService
         _context.Persons.Add(person);
         _context.PersonTopics.AddRange(personTopics);
         await _context.SaveChangesAsync();
+
+        return new PersonDto()
+        {
+            Id = person.Id,
+            Topics = person.PersonTopics.Select(x => x.Topic.Name)
+        };
     }
 
     public async Task SetRelation(string id, IDictionary<string, int> levels)

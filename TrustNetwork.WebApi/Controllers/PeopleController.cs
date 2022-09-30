@@ -20,8 +20,8 @@ public class PeopleController : ControllerBase
     [ProducesResponseType(400)]
     public async Task<IActionResult> AddPerson(PersonDto person)
     {
-        await _service.AddPerson(person);
-        return Created(string.Empty, null);
+        var res = await _service.AddPerson(person);
+        return Created(string.Empty, res);
     }
 
     [HttpPost("{id}/trust_connections")]
