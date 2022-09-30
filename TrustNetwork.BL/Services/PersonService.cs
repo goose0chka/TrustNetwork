@@ -16,13 +16,12 @@ public class PersonService
 
     public async Task AddPerson(PersonDto dto)
     {
-        dto.Id = dto.Id.Trim();
-        if (_context.Persons.Any(x => string.Equals(x.Id, dto.Id, StringComparison.InvariantCulture)))
+        if (_context.Persons.Any(x => string.Equals(x.Id, dto.Id)))
             throw new ArgumentException("Person with given id already exists");
 
         var person = new Person() { Id = dto.Id, };
 
-        var dtoTopics = dto.Topics.Select(x => x.ToLower().Trim());
+        var dtoTopics = dto.Topics.Select(x => x.ToLower());
 
         var existingTopics = await _context.Topics
             .Where(x => dtoTopics.Contains(x.Name))
