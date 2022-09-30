@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TrustNetwork.BL.DTO;
+using TrustNetwork.BL.Exceptions;
 using TrustNetwork.DAL;
 using TrustNetwork.DAL.Model;
 
@@ -17,7 +18,7 @@ public class PersonService
     public async Task AddPerson(PersonDto dto)
     {
         if (_context.Persons.Any(x => string.Equals(x.Id, dto.Id)))
-            throw new ArgumentException("Person with given id already exists");
+            throw new BadRequestException("Person with given id already exists");
 
         var person = new Person() { Id = dto.Id, };
 
@@ -49,13 +50,16 @@ public class PersonService
 
     public async Task SetRelation(string id, IDictionary<string, int> levels)
     {
-        if (levels.Values.Any(x => x < 1 && x > 10))
-            throw new ArgumentException("Trust level must be in 1-10 range");
-
         bool noPerson = _context.Persons.All(x => !string.Equals(x.Id, id));
+        if (noPerson)
+            throw new NotFoundException("No person with given id found");
+
+        if (levels.Values.Any(x => x < 1 && x > 10))
+            throw new BadRequestException("Trust level must be in 1-10 range");
+        
         bool noContacts = levels.Keys.Any(x => !_context.Persons.Any(y => string.Equals(y.Id, x)));
-        if (noPerson || noContacts)
-            throw new ArgumentException($"No person with given id found");
+        if (noContacts)
+            throw new BadRequestException($"No contact with given id found");
 
         var existingRelations = _context.Relations.Where(x => x.PersonId == id && levels.Keys.Contains(x.ContactId));
         var relationsToAdd = levels

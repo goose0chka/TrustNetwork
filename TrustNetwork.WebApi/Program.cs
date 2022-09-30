@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TrustNetwork.BL.Services;
 using TrustNetwork.DAL;
+using TrustNetwork.WebApi.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,8 @@ using (var db = scope.ServiceProvider.GetRequiredService<DataContext>())
     if (db.Database.GetPendingMigrations().Any())
         db.Database.Migrate();
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
