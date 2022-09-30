@@ -25,8 +25,9 @@ public class PeopleController : ControllerBase
     }
 
     [HttpPost("{id}/trust_connections")]
-    public Task<IActionResult> SetRelation(string id, IDictionary<string, int> levels)
+    public async Task<IActionResult> SetRelation(string id, IDictionary<string, int> levels)
     {
-        throw new NotImplementedException();
+        await _service.SetRelation(id, levels);
+        return Created(string.Empty, null);
     }
 }
