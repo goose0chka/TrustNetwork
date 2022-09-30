@@ -25,6 +25,9 @@ public class PeopleController : ControllerBase
     }
 
     [HttpPost("{id}/trust_connections")]
+    [ProducesResponseType(201)]
+    [ProducesResponseType(402)]
+    [ProducesResponseType(404)]
     public async Task<IActionResult> SetRelation(string id, IDictionary<string, int> levels)
     {
         await _service.SetRelation(id, levels);
