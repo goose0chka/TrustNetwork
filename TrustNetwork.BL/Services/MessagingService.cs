@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
 using TrustNetwork.BL.DTO;
 using TrustNetwork.BL.Exceptions;
 using TrustNetwork.DAL;
 using TrustNetwork.DAL.Model;
-
-using SendMessageResult = System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>;
 
 namespace TrustNetwork.BL.Services
 {
@@ -16,7 +15,7 @@ namespace TrustNetwork.BL.Services
             _context = context;
         }
 
-        public async Task<SendMessageResult> SendMessage(MessageDto message)
+        public async Task<IDictionary<string, IEnumerable<string>>> SendMessage(MessageDto message, IEnumerable<string>? usedIds = null)
         {
             if (!_context.Persons.Any(x => string.Equals(x.Id, message.FromPersonId)))
                 throw new BadRequestException("No person with given id found", "from_person_id");
@@ -35,7 +34,44 @@ namespace TrustNetwork.BL.Services
                 .ToListAsync();
 
             var toSend = connections.Where(x => personHasAllTopics(x, message.Topics));
-            return new SendMessageResult() { { message.FromPersonId, toSend.Select(x => x.Id) } };
+
+            IDictionary<string, IEnumerable<string>> res = new Dictionary<string, IEnumerable<string>>();
+            res.Add(await GetReceivers(message.FromPersonId, message.Topics, message.MinTrustLevel));
+
+            for (int i = 0; i < res.Count; i++)
+            {
+                var current = res.ElementAt(i);
+                var receivers = res.SelectMany(x => x.Value).ToList();
+                for (int j = 0; j < receivers.Count; j++)
+                {
+                    var key = receivers.ElementAt(j);
+                    if (res.ContainsKey(key)) continue;
+
+                    var localRec = await GetReceivers(key, message.Topics, message.MinTrustLevel);
+                    var value = localRec.Value.Where(x => !receivers.Contains(x) && !string.Equals(x, message.FromPersonId)).ToList();
+
+                    if (!value.Any()) continue;
+                    res.Add(key, value);
+                    receivers.AddRange(value);
+                }
+            }
+
+            return res;
+        }
+
+        private async Task<KeyValuePair<string, IEnumerable<string>>> GetReceivers(string id, IEnumerable<string> topics, int minTrust)
+        {
+            var connections = await _context.Relations
+                .Include(x => x.Contact)
+                    .ThenInclude(x => x.PersonTopics)
+                        .ThenInclude(x => x.Topic)
+                .Where(x => string.Equals(x.PersonId, id))
+                .Where(x => x.TrustLevel >= minTrust)
+                .Select(x => x.Contact)
+                .ToListAsync();
+
+            var toSend = connections.Where(x => personHasAllTopics(x, topics));
+            return new(id, toSend.Select(x => x.Id).ToList());
         }
 
         private static readonly Func<Person, string, bool> personHasTopic = (person, topic)
