@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    user: postgres
+    environment:
+      POSTGRES_PASSWORD: trustnetwork
+
+  api:
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: TrustNetwork.WebApi/Dockerfile
+    ports:
+      - "4300:80"
+    environment:
+      TRSUTNETWORK_DB_HOST: db
+      TRSUTNETWORK_DB_PORT: 5432
+      TRUSTNETWORK_DB_PWORD: trustnetwork

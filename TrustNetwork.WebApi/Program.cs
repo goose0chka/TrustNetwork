@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using TrustNetwork.BL.Services;
 using TrustNetwork.DAL;
 using TrustNetwork.WebApi.Middlewares;
@@ -9,10 +10,20 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var connStrBuilder = new NpgsqlConnectionStringBuilder
+{
+    Host = Environment.GetEnvironmentVariable("TRSUTNETWORK_DB_HOST"),
+    Port = int.Parse(Environment.GetEnvironmentVariable("TRSUTNETWORK_DB_PORT")!),
+    Username = "postgres",
+    Password = Environment.GetEnvironmentVariable("TRUSTNETWORK_DB_PWORD")
+};
+
 builder.Services.AddDbContext<DataContext>(
-    contextOpt => contextOpt.UseNpgsql(builder.Configuration["ConnectionStrings:TrustNetworkDb"],
-    npgsqlOpt => npgsqlOpt.MigrationsAssembly(typeof(DataContext).Assembly.FullName))
-    );
+    contextOpt => contextOpt.UseNpgsql(
+        connStrBuilder.ConnectionString,
+        npgsqlOpt => npgsqlOpt.MigrationsAssembly(typeof(DataContext).Assembly.FullName)
+    )
+);
 
 builder.Services.AddScoped<PersonService>();
 builder.Services.AddScoped<MessagingService>();
